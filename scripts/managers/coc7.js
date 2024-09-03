@@ -23,7 +23,6 @@ export class CoC7SystemManager extends SystemManager {
 
   /** @override */
   doGetRollHandler(handlerId, activeActor) {
-    console.log("coc7", handlerId, activeActor);
     return new Core(activeActor);
   }
 

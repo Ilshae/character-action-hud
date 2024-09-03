@@ -8,10 +8,8 @@ export class RollHandlerBaseCoC7 extends RollHandler {
 
   /** @override */
   doHandleActionEvent(event, encodedValue) {
-    console.log('doHandleActionEvent', event, encodedValue)
     let payload = encodedValue.split("|");
 
-    console.log("activeActor in doHandleActionEvent", this.activeActor);
     if (payload.length != 2) {
       super.throwInvalidValueErr();
     }

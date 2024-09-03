@@ -471,19 +471,16 @@ export class TokenActionHUD extends Application {
   }
 
   update() {
-    console.log("update");
     // Delay refresh because switching tokens could cause a controlToken(false) then controlToken(true) very fast
     if (this.refresh_timeout) clearTimeout(this.refresh_timeout);
     this.refresh_timeout = setTimeout(this.updateHud.bind(this), 100);
   }
 
   async updateHud() {
-    console.log("updateHud");
     settings.Logger.debug("Updating HUD");
 
     this.targetActions = await this.actions.buildActionList();
 
-    console.log("this.targetActions", this.targetActions);
     if (!this.showHudEnabled()) {
       this.close();
       return;

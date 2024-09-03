@@ -10,7 +10,6 @@ export class ActionHandlerCoC7 extends ActionHandler {
   /** @override */
   async doBuildActionList() {
     let result = this.initializeEmptyActionList();
-    console.log("yeet", this.activeActor);
 
     if (!this.activeActor) return result;
 
