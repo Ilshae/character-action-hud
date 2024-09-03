@@ -28,32 +28,29 @@ export class ActionHandler {
   }
 
   /** @public */
-  async buildActionList(token, multipleTokens) {
-    let actionList = await this.doBuildActionList(token, multipleTokens);
-    this._addGenericCategories(token, actionList, multipleTokens);
-    this._doBuildFurtherActions(token, actionList, multipleTokens);
+  async buildActionList() {
+    let actionList = await this.doBuildActionList();
+    this._addGenericCategories(actionList);
+    this._doBuildFurtherActions(actionList);
     await this.registerCoreCategories(actionList.categories);
     await this.categoryManager.addCategoriesToActionList(this, actionList);
     return actionList;
   }
 
   /** @public */
-  doBuildActionList(token) { }
+  doBuildActionList() { }
 
   /** @protected */
-  _addGenericCategories(token, actionList, multipleTokens) {
-    if (token || multipleTokens)
+  _addGenericCategories(actionList) {
       this.genericActionHandler.addGenericCategories(
-        token,
         actionList,
-        multipleTokens
       );
   }
 
   /** @protected */
-  _doBuildFurtherActions(token, actionList, multipleTokens) {
+  _doBuildFurtherActions(actionList) {
     this.furtherActionHandlers.forEach((handler) =>
-      handler.extendActionList(actionList, multipleTokens)
+      handler.extendActionList(actionList)
     );
   }
 

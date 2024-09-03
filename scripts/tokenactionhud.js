@@ -12,15 +12,16 @@ export class TokenActionHUD extends Application {
   defaultLeftPos = 150;
   defaultTopPos = 80;
 
-  constructor(systemManager) {
+  constructor(systemManager, activeActor, actors) {
     super();
     this.systemManager = systemManager;
+    this.activeActor = activeActor;
+    this.actors = actors;
   }
 
   async init(user) {
-    this.actions = await this.systemManager.getActionHandler(user);
-
-    this.rollHandler = this.systemManager.getRollHandler();
+    this.actions = await this.systemManager.getActionHandler(user, this.activeActor);
+    this.rollHandler = this.systemManager.getRollHandler(this.activeActor);
     this.filterManager = this.systemManager.getFilterManager();
     this.categoryManager = this.systemManager.getCategoryManager();
   }
@@ -31,7 +32,7 @@ export class TokenActionHUD extends Application {
   }
 
   updateRollHandler() {
-    this.rollHandler = this.systemManager.getRollHandler();
+    this.rollHandler = this.systemManager.getRollHandler(this.activeActor);
   }
 
   setTokensReference(tokens) {
@@ -83,7 +84,7 @@ export class TokenActionHUD extends Application {
     data.scale = this.getScale();
     data.background = this.getSetting("background") ?? "#00000000";
     settings.Logger.debug("HUD data:", data);
-    
+
     for (const category of data.actions.categories) {
       const advancedCategoryOptions = game.user.getFlag("token-action-hud", `categories.${category.id}.advancedCategoryOptions`);
       if (!advancedCategoryOptions?.compactView) continue;
@@ -120,7 +121,7 @@ export class TokenActionHUD extends Application {
     const category = ".tah-category";
     const titleButton = ".tah-title-button";
     const action = ".tah-action";
-  
+
     const handleClick = (e) => {
       let target = e.target;
 
@@ -305,7 +306,7 @@ export class TokenActionHUD extends Application {
       pos4 = clientY;
       elementTop = element.offsetTop - pos2;
       elementLeft = element.offsetLeft - pos1;
-      
+
       // set the element's new position:
       element.style.top = elementTop + "px";
       element.style.left = elementLeft + "px";
@@ -323,7 +324,7 @@ export class TokenActionHUD extends Application {
           "token-action-hud": { hudPos: { top: elementTop, left: elementLeft } },
         },
       });
-  
+
       settings.Logger.info(
         `Setting position to x: ${elementTop}px, y: ${elementLeft}px, and saving in user flags.`
       );
@@ -470,22 +471,19 @@ export class TokenActionHUD extends Application {
   }
 
   update() {
+    console.log("update");
     // Delay refresh because switching tokens could cause a controlToken(false) then controlToken(true) very fast
     if (this.refresh_timeout) clearTimeout(this.refresh_timeout);
     this.refresh_timeout = setTimeout(this.updateHud.bind(this), 100);
   }
 
   async updateHud() {
+    console.log("updateHud");
     settings.Logger.debug("Updating HUD");
 
-    let token = this._getTargetToken(this.tokens?.controlled);
+    this.targetActions = await this.actions.buildActionList();
 
-    let multipleTokens = this.tokens?.controlled.length > 1 && !token;
-    this.targetActions = await this.actions.buildActionList(
-      token,
-      multipleTokens
-    );
-
+    console.log("this.targetActions", this.targetActions);
     if (!this.showHudEnabled()) {
       this.close();
       return;

@@ -18,12 +18,12 @@ export class SystemManager {
     /** OVERRIDDEN BY SYSTEM */
 
     doGetActionHandler() {}
-    doGetRollHandler(handlerId) {}
+    doGetRollHandler(handlerId, activeActor) {}
     getAvailableRollHandlers() {}
     doRegisterSettings(appName, updateFunc) {}
 
 
-  async getActionHandler(user) {
+  async getActionHandler(user, activeActor) {
     this.filterManager = new FilterManager(user);
     this.categoryManager = new CategoryManager(user, this.filterManager);
 
@@ -31,7 +31,8 @@ export class SystemManager {
 
     let actionHandler = this.doGetActionHandler(
       this.filterManager,
-      this.categoryManager
+      this.categoryManager,
+      activeActor
     );
     this.addActionExtenders(actionHandler);
     return actionHandler;
@@ -56,7 +57,7 @@ export class SystemManager {
 
   /** ROLL HANDLERS */
 
-  getRollHandler() {
+  getRollHandler(activeActor) {
     let rollHandlerId = settings.get("rollHandler");
 
     if (
@@ -67,12 +68,12 @@ export class SystemManager {
       settings.set("rollHandler", rollHandlerId);
     }
 
-    let rollHandler = this.doGetRollHandler(rollHandlerId);
+    let rollHandler = this.doGetRollHandler(rollHandlerId, activeActor);
     this.addPreHandlers(rollHandler);
     return rollHandler;
   }
 
-  doGetRollHandler(handlerId) {}
+  doGetRollHandler(handlerId, activeActor) {}
 
   addPreHandlers(rollHandler) {
     rollHandler.addPreRollHandler(new CompendiumMacroPreHandler());

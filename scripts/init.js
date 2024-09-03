@@ -22,12 +22,12 @@ Hooks.on("init", () => {
     default: false
   });
 
-  const systemManagers = {  
+  const systemManagers = {
     "CoC7": "CoC7",
     /* put all the SystemManagers that are included directly in TAH here */
   }
   Hooks.call('preCreateTAHSystemManager', systemManagers); // this allows systems / modules to react to the hook and inject their own SystemManager
-  
+
   const system = game.system.id;
   const supportedSystem = systemManagers[system];
   if(!supportedSystem) {
@@ -59,7 +59,7 @@ Hooks.on("renderHotbar", (data, html) => {
 
 function sendHudToBottom () {
   if (!game.tokenActionHUD) return;
-   game.tokenActionHUD.element[0].style.zIndex = 0;       
+   game.tokenActionHUD.element[0].style.zIndex = 0;
 }
 
 // Hooks.on("init", () => {
@@ -89,7 +89,8 @@ Hooks.on("canvasReady", async () => {
   if (!user) throw new Error("Token Action HUD | No user found.");
 
   if (!game.tokenActionHUD) {
-    game.tokenActionHUD = new TokenActionHUD(systemManager);
+    // TODO: add list of actors
+    game.tokenActionHUD = new TokenActionHUD(systemManager, user.character, user.character);
     await game.tokenActionHUD.init(user);
   }
 

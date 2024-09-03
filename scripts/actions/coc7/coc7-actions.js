@@ -2,32 +2,26 @@ import { ActionHandler } from "../actionHandler.js";
 import * as settings from "../../settings.js";
 
 export class ActionHandlerCoC7 extends ActionHandler {
-  constructor(filterManager, categoryManager) {
+  constructor(filterManager, categoryManager, activeActor) {
     super(filterManager, categoryManager);
+    this.activeActor = activeActor;
   }
 
   /** @override */
-  async doBuildActionList(token, multipleTokens) {
+  async doBuildActionList() {
     let result = this.initializeEmptyActionList();
+    console.log("yeet", this.activeActor);
 
-    if (!token) return result;
+    if (!this.activeActor) return result;
 
-    let tokenId = token.id;
-
-    result.tokenId = tokenId;
-
-    let actor = token.actor;
-
-    if (!actor) return result;
-
-    if (!['character', 'npc', 'creature'].includes(actor.type)) {
+    if (!['character', 'npc', 'creature'].includes(this.activeActor.type)) {
       return result;
     }
 
-    result.actorId = actor.id;
+    result.actorId = this.activeActor.id;
 
-    let actions = this._getActions(actor, tokenId);
-    let skills = this._getSkills(actor, tokenId);
+    let actions = this._getActions(this.activeActor);
+    let skills = this._getSkills(this.activeActor);
 
     this._combineCategoryWithList(
       result,
@@ -41,12 +35,12 @@ export class ActionHandlerCoC7 extends ActionHandler {
       skills
     );
 
-    if (settings.get("showHudTitle")) result.hudTitle = token.name;
+    if (settings.get("showHudTitle")) result.hudTitle = this.activeActor.name;
 
     return result;
   }
 
-  _getActions(actor, tokenId) {
+  _getActions(actor) {
     let result = this.initializeEmptyCategory("actions");
 
     let category = this.initializeEmptySubcategory();
@@ -56,19 +50,19 @@ export class ActionHandlerCoC7 extends ActionHandler {
     for (let characteristicKey in actor.system.characteristics) {
       category.actions.push({
         name: this.i18n(actor.system.characteristics[characteristicKey].label),
-        encodedValue: ["characteristic", tokenId, characteristicKey].join(this.delimiter),
+        encodedValue: ["characteristic", characteristicKey].join(this.delimiter),
       });
     }
     if (actor.system.attribs.lck.value) {
       category.actions.push({
         name: actor.system.attribs.lck.label,
-        encodedValue: ["attribute", tokenId, 'lck'].join(this.delimiter),
+        encodedValue: ["attribute", 'lck'].join(this.delimiter),
       });
     }
     if (actor.system.attribs.san.value) {
       category.actions.push({
         name: actor.system.attribs.san.label,
-        encodedValue: ["attribute", tokenId, 'san'].join(this.delimiter),
+        encodedValue: ["attribute", 'san'].join(this.delimiter),
       });
     }
 
@@ -98,12 +92,12 @@ export class ActionHandlerCoC7 extends ActionHandler {
         if (item.system.properties?.rngd) {
           ranged.actions.push({
             name: item.name,
-            encodedValue: ["weapon", tokenId, item.id].join(this.delimiter),
+            encodedValue: ["weapon", item.id].join(this.delimiter),
           });
         } else {
           melee.actions.push({
             name: item.name,
-            encodedValue: ["weapon", tokenId, item.id].join(this.delimiter),
+            encodedValue: ["weapon", item.id].join(this.delimiter),
           });
         }
       }
@@ -152,7 +146,7 @@ export class ActionHandlerCoC7 extends ActionHandler {
     return result;
   }
 
-  _getSkills(actor, tokenId) {
+  _getSkills(actor) {
     let result = this.initializeEmptyCategory("skills");
 
     let category = this.initializeEmptySubcategory();
@@ -161,7 +155,7 @@ export class ActionHandlerCoC7 extends ActionHandler {
       if (item.type === 'skill') {
         category.actions.push({
           name: item.name,
-          encodedValue: ["skill", tokenId, item.name].join(this.delimiter),
+          encodedValue: ["skill", item.name].join(this.delimiter),
         });
       }
     }

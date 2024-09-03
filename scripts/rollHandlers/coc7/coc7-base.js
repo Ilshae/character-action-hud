@@ -1,8 +1,9 @@
 import { RollHandler } from "../rollHandler.js";
 
 export class RollHandlerBaseCoC7 extends RollHandler {
-  constructor() {
+  constructor(activeActor) {
     super();
+    this.activeActor = activeActor;
   }
 
   /** @override */
@@ -10,15 +11,15 @@ export class RollHandlerBaseCoC7 extends RollHandler {
     console.log('doHandleActionEvent', event, encodedValue)
     let payload = encodedValue.split("|");
 
-    if (payload.length != 3) {
+    console.log("activeActor in doHandleActionEvent", this.activeActor);
+    if (payload.length != 2) {
       super.throwInvalidValueErr();
     }
 
     let macroType = payload[0];
-    let tokenId = payload[1];
-    let actionId = payload[2];
+    let actionId = payload[1];
 
-    let actor = super.getActor(tokenId);
+    let actor = this.activeActor;
 
     switch (macroType) {
       case 'characteristic':

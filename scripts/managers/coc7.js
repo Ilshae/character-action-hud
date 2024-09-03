@@ -9,8 +9,8 @@ export class CoC7SystemManager extends SystemManager {
   }
 
   /** @override */
-  doGetActionHandler(filterManager, categoryManager) {
-    let actionHandler = new ActionHandler(filterManager, categoryManager);
+  doGetActionHandler(filterManager, categoryManager, activeActor) {
+    let actionHandler = new ActionHandler(filterManager, categoryManager, activeActor);
     return actionHandler;
   }
 
@@ -22,8 +22,9 @@ export class CoC7SystemManager extends SystemManager {
   }
 
   /** @override */
-  doGetRollHandler(handlerId) {
-    return new Core();
+  doGetRollHandler(handlerId, activeActor) {
+    console.log("coc7", handlerId, activeActor);
+    return new Core(activeActor);
   }
 
   /** @override */
